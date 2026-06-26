@@ -54,16 +54,16 @@ const userSchema = new Schema(
 
 })
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
 
     // if(this.isModified("password")) {
     //     this.password = bcrypt.hash(this.password, 10);
     // }
 
-    if(!this.isModified("password")) return next();
+    if(!this.isModified("password")) return;
 
-    this.password = bcrypt.hash(this.password, 10);
-    next();   // this encrypts the password before saving the user document to the database. It checks if the password field has been modified, and if so, it hashes the password using bcrypt with a salt round of 10. After hashing, it calls next() to proceed with saving the document.
+    this.password = await bcrypt.hash(this.password, 10);
+       // this encrypts the password before saving the user document to the database. It checks if the password field has been modified, and if so, it hashes the password using bcrypt with a salt round of 10. After hashing, it calls next() to proceed with saving the document.
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
@@ -76,7 +76,7 @@ userSchema.methods.generateAccessToken = function(){
             _id: this._id,
             email: this.email,
             username: this.username,
-            fullname: this.fullname,
+            fullName: this.fullName,
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
@@ -85,17 +85,15 @@ userSchema.methods.generateAccessToken = function(){
     )
 }
 
-userSchema.methods.generateRefreshToken = function() {
-    jwt.sign(
+userSchema.methods.generateRefreshToken = function(){
+    return jwt.sign(
         {
             _id: this._id,
-            email: this.email,
-            username: this.username,
-            fullname: this.fullname,
+            
         },
-        process.env.ACCESS_TOKEN_SECRET,
+        process.env.REFRESH_TOKEN_SECRET,
         {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
         }
     )
 }
