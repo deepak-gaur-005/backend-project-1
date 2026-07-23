@@ -46,6 +46,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
         throw error;
     }
 };
+
 const registerUser = asyncHandler( async (req, res) => {
     // res.status(200).json({
     //     message: "ok"
@@ -347,8 +348,6 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
         new ApiResponse(200, user, "Avatar image updated successfully")
     ) 
 })
-
-
 
 const updateUserCoverImage = asyncHandler(async(req, res) => {
     const coverImageLocalPath = req.file?.path
