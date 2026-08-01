@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary} from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 // const generateAccessAndRefreshTokens = async(userId) => {
 //     try{
@@ -464,7 +465,7 @@ const getWatchHistory = asyncHandler(async(req, res) => {
         {
             $lookup: {
                 from: "videos",
-                foreignField: "watchHistory",
+                localField: "watchHistory",
                 foreignField: "_id",
                 as: "watchHistory",
                 pipeline: [
