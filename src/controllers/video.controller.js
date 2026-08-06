@@ -71,7 +71,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(
-        new ApiResponse(200, "Videos fetched successfully", fetchedvideos)
+        new ApiResponse(200, fetchedvideos, "Videos fetched successfully",)
     )
 })
 
@@ -97,11 +97,11 @@ const publishAVideo = asyncHandler(async (req, res) => {
     const videofile = await uploadOnCloudinary(videoFileLocalPath);
     const thumbnail = await uploadOnCloudinary(thumbnailFileLocalPath)
 
-    if (!videoFile) {
+    if (!videofile) {
         throw new ApiError(500, "Video upload failed")
     }
 
-    if (thumbnail) {
+    if (!thumbnail) {
         throw new ApiError(500, "Thumbnail upload failed")
     }
 
@@ -110,7 +110,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
         description,
         videoFile: videofile.url,
         thumbnail: thumbnail.url,
-        duration: videoFile.duration,
+        duration: videofile.duration,
         owner: req.user._id,
         isPublished: true
     })
@@ -124,7 +124,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
     return res
     .status(201)
     .json(
-        new ApiResponse(201, "Video published successfully", publishedVideo)    
+        new ApiResponse(201, publishedVideo, "Video published successfully",)    
     )
 })
 
@@ -162,7 +162,7 @@ const getVideoById = asyncHandler(async (req, res) => {
         {
             $addFields: {
                 owner: {
-                    $first: "owner"
+                    $first: "$owner"
                 }
             }
         }
@@ -175,7 +175,7 @@ const getVideoById = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(
-        new ApiResponse(200, "Video fetched successfully", video[0])
+        new ApiResponse(200, video[0], "Video fetched successfully")
     )
 
 })
@@ -185,6 +185,9 @@ const updateVideo = asyncHandler(async (req, res) => {
     // TODO: update video details like title , description, thumbnail
     const{ title, description} = req.body;
 
+    console.log(req.body);
+    console.log(req.file);
+
     if(!isValidObjectId(videoId)) {
         throw new ApiError(400, "invalid video id")
     }
@@ -193,7 +196,7 @@ const updateVideo = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Title and description are required")
     }
 
-    const thumbnailFileLocalPath = req.files?.thumbnail?.[0]?.path
+    const thumbnailFileLocalPath = req.file?.path;
     if(!thumbnailFileLocalPath) {
         throw new ApiError(400, "Thumbnail is required")
     }
@@ -225,7 +228,7 @@ const updateVideo = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(
-        new ApiResponse(200, "Video updated successfully", video)
+        new ApiResponse(200, video, "Video updated successfully")
     )
 })
 
@@ -252,12 +255,12 @@ const deleteVideo = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(
-        new ApiResponse(200, "Video deleted successfully", {})
+        new ApiResponse(200, {}, "Video deleted successfully")
     )
 
 })
 
-const toggleVideoPublishedStatus = asyncHandler(async (req, res) => {
+const togglePublishStatus = asyncHandler(async (req, res) => {
     const { videoId } = req.params
 
     if(!isValidObjectId(videoId)) {
@@ -294,5 +297,5 @@ export {
     getVideoById,
     updateVideo,
     deleteVideo,
-    toggleVideoPublishedStatus
+    togglePublishStatus
 }
