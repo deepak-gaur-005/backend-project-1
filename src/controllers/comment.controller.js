@@ -38,6 +38,10 @@ const addComment = asyncHandler(async( req, res) => {
         throw new ApiError(400, "Invalid video id");
     }
 
+    if (!content?.trim()) {
+        throw new ApiError(400, "Content is required");
+    }
+
     const comment = await Comment.create({
         content,
         video: videoId,
@@ -114,7 +118,7 @@ const deleteComment = asyncHandler(async (req, res) => {
         new ApiResponse(
             200,
             {},
-            "Comment deleted succcefully"
+            "Comment deleted succcessfully"
     )
     )
 })
